@@ -1,5 +1,5 @@
 #include "ui.hpp"
-#include "widgets.hpp"
+#include "settings.hpp"
 #include <raylib.h>
 #include <string>
 
@@ -38,6 +38,14 @@ void UI::toolBar() {
     needsInput = true;
   } else {
     needsInput = false;
+  }
+
+  // Color Pallete on tool bar left
+  Widgets::ColorEdit({toolBarRect.x + 30, 15, 200, 30}, g_settings.drawColor,
+                     currentPallete, wheel);
+
+  if (Widgets::ColorWheel(currentPallete, wheel)) {
+    needsInput = true;
   }
 
   // Center label for displaying current frame

@@ -1,4 +1,5 @@
 #include "frame.hpp"
+#include "settings.hpp"
 #include <raylib.h>
 
 // Constructor sets resolution of the frame to given by main()
@@ -11,6 +12,12 @@ Frame::Frame(Vector2 res) {
   EndTextureMode();
 
   saveState();
+}
+
+// Clears the mouse position. useful for when stopping undates
+void Frame::clearMousePos() {
+  prevMousePos = Vector2{0.0f, 0.0f};
+  mousePos = Vector2{0.0f, 0.0f};
 }
 
 // Helper function to save the current canvas into a image snapshot
@@ -40,19 +47,21 @@ void Frame::handleMouse(bool canDraw) {
 
   bool isDrawing = leftButtonDown || rightButtonDown;
 
-  if (canDraw) {
+  if (canDraw && isDrawing) {
+    activeColor = rightButtonDown ? g_settings.bgColor : g_settings.drawColor;
 
-    if (isDrawing) {
-      activeColor = rightButtonDown ? bgColor : drawColor;
+    // Only draw a segment if we were already drawing last frame.
+    if (wasDrawing) {
 
-      // Draw the line onto the canvas
       BeginTextureMode(canvas);
-
-      // Draw circles to make lines looks smoother
       DrawCircleV(prevMousePos, lineThickness / 2.0f, activeColor);
       DrawCircleV(mousePos, lineThickness / 2.0f, activeColor);
       DrawLineEx(prevMousePos, mousePos, lineThickness, activeColor);
+      EndTextureMode();
+    } else {
 
+      BeginTextureMode(canvas);
+      DrawCircleV(mousePos, lineThickness / 2.0f, activeColor);
       EndTextureMode();
     }
   }
@@ -77,7 +86,8 @@ void Frame::handleMouse(bool canDraw) {
   }
 
   // Redo Function -- if there is a forward state then move current to
-  // past buffer and switch to that forward state then remove it from redoStates
+  // past buffer and switch to that forward state then remove it from
+  // redoStates
   if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Y)) {
     if (!redoStates.empty()) {
       states.push_back(redoStates.back());

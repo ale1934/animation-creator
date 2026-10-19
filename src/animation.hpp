@@ -22,10 +22,12 @@ private:
 public:
   Animation(Vector2 res, int fps, int frameCount);
 
-  void update(bool canDraw = true);
+  void update();
   void render();
 
   int getCurrentFrame() const;
+
+  void clearMousePos();
 
   void exportPNGs(const std::string &dir);
   void exportGif(const std::string &path);

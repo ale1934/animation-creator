@@ -32,7 +32,7 @@ Animation::Animation(Vector2 res, int fps, int frameCount) {
   tintLoc = GetShaderLocation(onionShader, "tint");
 }
 
-void Animation::update(bool canDraw) {
+void Animation::update() {
   // Toggle animation playback
   if (IsKeyPressed(KEY_SPACE)) {
     animating = !animating;
@@ -99,6 +99,8 @@ void Animation::render() {
     }
   }
 }
+
+void Animation::clearMousePos() { frames.at(currentFrame)->clearMousePos(); }
 
 void Animation::exportPNGs(const std::string &dir) {
   std::filesystem::create_directories(dir);

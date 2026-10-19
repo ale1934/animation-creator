@@ -16,6 +16,7 @@ add_executable(animation-creator
     src/animation.cpp
     src/ui.cpp
     src/widgets.cpp
+	src/settings.cpp
 )
 
 target_include_directories(animation-creator PRIVATE

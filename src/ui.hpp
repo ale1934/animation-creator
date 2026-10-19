@@ -1,6 +1,7 @@
 #pragma once
 
 #include "animation.hpp"
+#include "widgets.hpp"
 #include <raylib.h>
 
 class UI {
@@ -16,6 +17,14 @@ private:
 
   void panel();
   void toolBar();
+
+  ColorWheelState wheel;
+  Color col1 = BLACK;
+  Color col2 = GRAY;
+  Color col3 = BLUE;
+  Color col4 = RED;
+  Color col5 = GREEN;
+  std::vector<Color> currentPallete = {col1, col2, col3, col4, col5};
 
   Rectangle toolBarRect;
   Color toolBarColor = RAYWHITE;

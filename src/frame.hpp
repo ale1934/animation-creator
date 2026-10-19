@@ -1,5 +1,6 @@
 #pragma once
 
+#include "settings.hpp"
 #include <deque>
 #include <raylib.h>
 
@@ -26,9 +27,7 @@ private:
 
   float lineThickness = 8.0f;
 
-  Color bgColor = RAYWHITE;
-  Color drawColor = BLACK;
-  Color activeColor = drawColor;
+  Color activeColor = g_settings.drawColor;
 
   void saveState(); // Saves image state
 
@@ -39,4 +38,5 @@ public:
   Image getImage();
 
   void renderOnion(Shader &shader, int tintLoc, Color tint);
+  void clearMousePos();
 };
