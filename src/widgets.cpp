@@ -1,4 +1,5 @@
 #include "widgets.hpp"
+#include "settings.hpp"
 #include <math.h>
 #include <raylib.h>
 
@@ -41,7 +42,8 @@ void Widgets::Label(Font UiFont, Rectangle dimensions, std::string label,
                     Color borderColor, float borderThickness) {
   DrawRectangleRounded(dimensions, roundness, SEGMENTS, color);
 
-  drawCenteredText(UiFont, dimensions, label.c_str(), BLACK, FONTSIZE);
+  drawCenteredText(UiFont, dimensions, label.c_str(), g_settings.UITextColor,
+                   FONTSIZE);
 
   Vector2 center = {dimensions.x + dimensions.width / 2.0f,
                     dimensions.y + dimensions.height / 2.0f};
@@ -58,10 +60,11 @@ bool Widgets::Button(Font UiFont, Rectangle dimensions, std::string label,
   bool mouseHover = CheckCollisionPointRec(GetMousePosition(), dimensions);
 
   if (mouseHover) {
-    drawCenteredText(UiFont, dimensions, label.c_str(), Fade(BLACK, 0.6f),
-                     FONTSIZE);
+    drawCenteredText(UiFont, dimensions, label.c_str(),
+                     Fade(g_settings.UITextColor, 0.6f), FONTSIZE);
   } else {
-    drawCenteredText(UiFont, dimensions, label.c_str(), BLACK, FONTSIZE);
+    drawCenteredText(UiFont, dimensions, label.c_str(), g_settings.UITextColor,
+                     FONTSIZE);
   }
 
   Vector2 center = {dimensions.x + dimensions.width / 2.0f,
@@ -76,7 +79,7 @@ bool Widgets::Button(Font UiFont, Rectangle dimensions, std::string label,
 
 void Widgets::ColorEdit(Rectangle dimensions, Color &color,
                         std::vector<Color> &palette, ColorWheelState &wheel) {
-  DrawRectangleRec(dimensions, RAYWHITE);
+  DrawRectangleRec(dimensions, g_settings.UIBackground);
 
   if (palette.empty()) {
     return;
@@ -196,6 +199,7 @@ bool Widgets::ColorWheel(std::vector<Color> &palette, ColorWheelState &wheel) {
   if ((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && distance > outer + 12) ||
       IsKeyPressed(KEY_ENTER)) {
     wheel.open = false;
+    g_settings.drawColor = palette.at(wheel.selectedIndex);
   }
 
   return wheel.open;

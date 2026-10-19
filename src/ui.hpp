@@ -9,7 +9,7 @@ private:
   Vector2 dimensions;
 
   bool needsInput = false;
-  bool showTools = false;
+  bool showTools = true;
 
   Animation *currentAnimation;
 
@@ -27,8 +27,6 @@ private:
   std::vector<Color> currentPallete = {col1, col2, col3, col4, col5};
 
   Rectangle toolBarRect;
-  Color toolBarColor = RAYWHITE;
-  Color toolBarBorderColor = GetColor(0x000103ff);
 
 public:
   UI(Vector2 dim, Animation &anim);

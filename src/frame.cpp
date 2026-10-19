@@ -97,6 +97,13 @@ void Frame::handleMouse(bool canDraw) {
     }
   }
 
+  // Change Brush Size
+  lineThickness += GetMouseWheelMove() * 3;
+  if (lineThickness < 2.0f)
+    lineThickness = 2.0f;
+  if (lineThickness > 40.0f)
+    lineThickness = 40.0f;
+
   prevMousePos = GetMousePosition();
 }
 
@@ -110,8 +117,8 @@ void Frame::renderFrame() {
 
   // Draw the preview circle
   if (!leftButtonDown)
-    DrawCircleLinesV(GetMousePosition(), lineThickness / 2.0f,
-                     (Color){127, 127, 127, 127});
+    DrawCircleLinesEx(GetMousePosition(), lineThickness / 2.0f, 2.0f,
+                      (Color){127, 127, 127, 255});
 }
 
 void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {

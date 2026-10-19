@@ -33,15 +33,15 @@ void UI::render() {
 
 void UI::toolBar() {
   // Main Panel
-  if (Widgets::Panel(toolBarRect, toolBarColor, 0.3f, true, toolBarBorderColor,
-                     1.0f)) {
+  if (Widgets::Panel(toolBarRect, g_settings.UIBackground, 0.3f, true,
+                     g_settings.UIBackgroundBorder, 1.0f)) {
     needsInput = true;
   } else {
     needsInput = false;
   }
 
-  // Color Pallete on tool bar left
-  Widgets::ColorEdit({toolBarRect.x + 30, 15, 200, 30}, g_settings.drawColor,
+  // Color Pallete on tool bar top
+  Widgets::ColorEdit({toolBarRect.x + 10, 15, 180, 30}, g_settings.drawColor,
                      currentPallete, wheel);
 
   if (Widgets::ColorWheel(currentPallete, wheel)) {
@@ -52,11 +52,12 @@ void UI::toolBar() {
   Widgets::Label(
       UiFont, {toolBarRect.x + toolBarRect.width / 2 - 40, 15, 80, 30},
       "Frame: " + std::to_string(currentAnimation->getCurrentFrame() + 1),
-      toolBarColor, 0.3f, true, toolBarBorderColor, 1.0f);
+      g_settings.UIBackground, 0.3f, true, g_settings.UIBackgroundBorder, 1.0f);
 
-  if (Widgets::Button(
-          UiFont, {toolBarRect.x + toolBarRect.width - 90, 15, 80, 30}, "Save",
-          toolBarColor, 0.3f, true, toolBarBorderColor, 1.0f)) {
+  if (Widgets::Button(UiFont,
+                      {toolBarRect.x + toolBarRect.width - 90, 15, 80, 30},
+                      "Save", g_settings.UIBackground, 0.3f, true,
+                      g_settings.UIBackgroundBorder, 1.0f)) {
     currentAnimation->exportGif("animation.gif");
     currentAnimation->exportPNGs("export");
   }
