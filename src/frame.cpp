@@ -1,5 +1,7 @@
 #include "frame.hpp"
 #include "settings.hpp"
+#include <algorithm>
+#include <cmath>
 #include <raylib.h>
 
 // Constructor sets resolution of the frame to given by main()
@@ -40,30 +42,82 @@ void Frame::saveState() {
 
 // Handles Mouse Input (AKA draws on the frame)
 void Frame::handleMouse(bool canDraw) {
-  mousePos = GetMousePosition();
+  Vector2 mouse = GetMousePosition();
+
+  bool ctrlDown = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
+
+  // Start panning with Ctrl + left-click
+  if (ctrlDown && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    isPanning = true;
+  }
+
+  // Stop panning when the mouse button is released
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    isPanning = false;
+  }
+
+  // Move the canvas with the mouse
+  if (isPanning) {
+    Vector2 delta = GetMouseDelta();
+
+    g_settings.canvasOffset.x += delta.x;
+    g_settings.canvasOffset.y += delta.y;
+  }
+
+  // Zoom toward the mouse cursor
+  float wheel = GetMouseWheelMove();
+
+  if (wheel != 0.0f) {
+    float oldZoom = g_settings.zoom;
+
+    g_settings.zoom *= powf(1.1f, wheel);
+    g_settings.zoom =
+        std::clamp(g_settings.zoom, g_settings.minZoom, g_settings.maxZoom);
+
+    // Keep the point under the cursor stationary
+    g_settings.canvasOffset.x =
+        mouse.x -
+        (mouse.x - g_settings.canvasOffset.x) * (g_settings.zoom / oldZoom);
+
+    g_settings.canvasOffset.y =
+        mouse.y -
+        (mouse.y - g_settings.canvasOffset.y) * (g_settings.zoom / oldZoom);
+  }
+
+  // Convert screen coordinates to canvas coordinates
+  mousePos = {(mouse.x - g_settings.canvasOffset.x) / g_settings.zoom,
+              (mouse.y - g_settings.canvasOffset.y) / g_settings.zoom};
 
   leftButtonDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
   rightButtonDown = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
 
-  bool isDrawing = leftButtonDown || rightButtonDown;
+  bool isDrawing =
+      (leftButtonDown || rightButtonDown) && !isPanning && !ctrlDown;
 
-  if (canDraw && isDrawing) {
+  if (canDraw && isDrawing && !isPanning && !ctrlDown) {
     activeColor = rightButtonDown ? g_settings.bgColor : g_settings.drawColor;
 
     // Only draw a segment if we were already drawing last frame.
     if (wasDrawing) {
 
       BeginTextureMode(canvas);
-      DrawCircleV(prevMousePos, lineThickness / 2.0f, activeColor);
-      DrawCircleV(mousePos, lineThickness / 2.0f, activeColor);
-      DrawLineEx(prevMousePos, mousePos, lineThickness, activeColor);
+      DrawCircleV(prevMousePos, g_settings.lineThickness / 2.0f, activeColor);
+      DrawCircleV(mousePos, g_settings.lineThickness / 2.0f, activeColor);
+      DrawLineEx(prevMousePos, mousePos, g_settings.lineThickness, activeColor);
       EndTextureMode();
     } else {
 
       BeginTextureMode(canvas);
-      DrawCircleV(mousePos, lineThickness / 2.0f, activeColor);
+      DrawCircleV(mousePos, g_settings.lineThickness / 2.0f, activeColor);
       EndTextureMode();
     }
+  }
+
+  if (IsKeyPressed(KEY_C)) {
+    BeginTextureMode(canvas);
+    ClearBackground(RAYWHITE);
+    EndTextureMode();
+    wasDrawing = true;
   }
 
   // Save state if something changed and is not currently drawing
@@ -97,40 +151,43 @@ void Frame::handleMouse(bool canDraw) {
     }
   }
 
-  // Change Brush Size
-  lineThickness += GetMouseWheelMove() * 3;
-  if (lineThickness < 2.0f)
-    lineThickness = 2.0f;
-  if (lineThickness > 40.0f)
-    lineThickness = 40.0f;
-
-  prevMousePos = GetMousePosition();
+  prevMousePos = mousePos;
 }
 
 // Draws Frame Texture onto Screen
 void Frame::renderFrame() {
-  // Draw the render texture to the screen
-  DrawTextureRec(canvas.texture,
-                 Rectangle{0, 0, (float)canvas.texture.width,
-                           (float)-canvas.texture.height},
-                 Vector2{0, 0}, WHITE);
+  Rectangle source = {0, 0, (float)canvas.texture.width,
+                      (float)-canvas.texture.height};
 
-  // Draw the preview circle
-  if (!leftButtonDown)
-    DrawCircleLinesEx(GetMousePosition(), lineThickness / 2.0f, 2.0f,
-                      (Color){127, 127, 127, 255});
+  Rectangle dest = {g_settings.canvasOffset.x, g_settings.canvasOffset.y,
+                    resolution.x * g_settings.zoom,
+                    resolution.y * g_settings.zoom};
+
+  DrawTexturePro(canvas.texture, source, dest, {0, 0}, 0.0f, WHITE);
+
+  // Brush preview remains centered on the screen cursor
+  DrawCircleLinesEx(GetMousePosition(),
+                    g_settings.lineThickness * g_settings.zoom / 2.0f, 2.0f,
+                    (Color){127, 127, 127, 255});
 }
 
 void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {
   float c[4] = {tint.r / 255.0f, tint.g / 255.0f, tint.b / 255.0f,
                 tint.a / 255.0f};
+
   SetShaderValue(shader, tintLoc, c, SHADER_UNIFORM_VEC4);
 
+  Rectangle source = {0, 0, (float)canvas.texture.width,
+                      (float)-canvas.texture.height};
+
+  Rectangle dest = {g_settings.canvasOffset.x, g_settings.canvasOffset.y,
+                    resolution.x * g_settings.zoom,
+                    resolution.y * g_settings.zoom};
+
   BeginShaderMode(shader);
-  DrawTextureRec(canvas.texture,
-                 Rectangle{0, 0, (float)canvas.texture.width,
-                           (float)-canvas.texture.height},
-                 Vector2{0, 0}, WHITE);
+
+  DrawTexturePro(canvas.texture, source, dest, {0, 0}, 0.0f, WHITE);
+
   EndShaderMode();
 }
 

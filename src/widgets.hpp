@@ -34,4 +34,8 @@ public:
                         std::vector<Color> &palette, ColorWheelState &wheel);
 
   bool static ColorWheel(std::vector<Color> &palette, ColorWheelState &wheel);
+
+  void static FloatSlider(Rectangle dimensions, Color sliderColor,
+                          Color buttonColor, float &value, float minValue,
+                          float maxValue);
 };

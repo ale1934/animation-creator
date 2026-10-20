@@ -1,5 +1,6 @@
 #include "widgets.hpp"
 #include "settings.hpp"
+#include <algorithm>
 #include <math.h>
 #include <raylib.h>
 
@@ -203,4 +204,38 @@ bool Widgets::ColorWheel(std::vector<Color> &palette, ColorWheelState &wheel) {
   }
 
   return wheel.open;
+}
+
+void Widgets::FloatSlider(Rectangle dimensions, Color sliderColor,
+                          Color buttonColor, float &value, float minValue,
+                          float maxValue) {
+  DrawLineEx({dimensions.x, dimensions.y + dimensions.height / 2 - 3.0f},
+             {dimensions.width + dimensions.x,
+              dimensions.y + dimensions.height / 2 - 3.0f},
+             6.0f, sliderColor);
+
+  float sliderHeadX =
+      ((value - minValue) / (maxValue - minValue)) * dimensions.width;
+
+  DrawCircleV(
+      {sliderHeadX + dimensions.x, dimensions.y + dimensions.height / 2 - 3.0f},
+      10.0f, buttonColor);
+
+  DrawCircleLinesEx(
+      {sliderHeadX + dimensions.x, dimensions.y + dimensions.height / 2 - 3.0f},
+      10.0f, 1.0f, sliderColor);
+
+  if (CheckCollisionPointCircle(GetMousePosition(),
+                                {sliderHeadX + dimensions.x,
+                                 dimensions.y + dimensions.height / 2 - 3.0f},
+                                10.0f) &&
+      IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+
+    float t = (GetMouseX() - dimensions.x) / dimensions.width;
+
+    // Clamp the mouse position to the slider bounds
+    t = std::clamp(t, 0.0f, 1.0f);
+
+    value = minValue + t * (maxValue - minValue);
+  }
 }

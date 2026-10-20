@@ -17,6 +17,7 @@ private:
 
   bool leftButtonDown = false;
   bool rightButtonDown = false;
+  bool isPanning = false;
 
   // Handles image states to allow undo/redo
   std::deque<Image> states;     // Can handle 20 states
@@ -24,8 +25,6 @@ private:
 
   bool wasDrawing = false;
   bool isDrawing = false;
-
-  float lineThickness = 8.0f;
 
   Color activeColor = g_settings.drawColor;
 

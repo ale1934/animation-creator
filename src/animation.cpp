@@ -43,11 +43,11 @@ void Animation::update() {
   if (!animating) {
     frames.at(currentFrame)->handleMouse(canDraw);
 
-    if (IsKeyPressed(KEY_RIGHT)) {
+    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_E)) {
       if (currentFrame + 1 < frames.size()) {
         currentFrame++;
       }
-    } else if (IsKeyPressed(KEY_LEFT)) {
+    } else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_Q)) {
       if (currentFrame > 0) {
         currentFrame--;
       }

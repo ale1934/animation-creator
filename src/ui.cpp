@@ -1,5 +1,7 @@
 #include "ui.hpp"
 #include "settings.hpp"
+#include "widgets.hpp"
+#include <format>
 #include <raylib.h>
 #include <string>
 
@@ -29,6 +31,14 @@ void UI::update() {
 void UI::render() {
   if (showTools)
     toolBar();
+
+  // Center label for displaying current frame
+  DrawTextEx(
+      UiFont,
+      ("Frame: " + std::to_string(currentAnimation->getCurrentFrame() + 1))
+          .c_str(),
+      {toolBarRect.x + toolBarRect.width / 2 - 40, dimensions.y - 20}, FONTSIZE,
+      0.0f, g_settings.UITextColor);
 }
 
 void UI::toolBar() {
@@ -41,18 +51,24 @@ void UI::toolBar() {
   }
 
   // Color Pallete on tool bar top
-  Widgets::ColorEdit({toolBarRect.x + 10, 15, 180, 30}, g_settings.drawColor,
+  Widgets::ColorEdit({toolBarRect.x + 10, 15, 90, 30}, g_settings.drawColor,
                      currentPallete, wheel);
 
   if (Widgets::ColorWheel(currentPallete, wheel)) {
     needsInput = true;
   }
 
-  // Center label for displaying current frame
-  Widgets::Label(
-      UiFont, {toolBarRect.x + toolBarRect.width / 2 - 40, 15, 80, 30},
-      "Frame: " + std::to_string(currentAnimation->getCurrentFrame() + 1),
-      g_settings.UIBackground, 0.3f, true, g_settings.UIBackgroundBorder, 1.0f);
+  // Slider select for line thickness
+  Widgets::FloatSlider({toolBarRect.x + 120, 18, 80, 30}, GRAY,
+                       g_settings.UIBackground, g_settings.lineThickness, 2.0f,
+                       40.0f);
+
+  // Display current line thickness
+  std::string lineThicknessText = std::format("{:g}", g_settings.lineThickness);
+  Widgets::Label(UiFont,
+                 {toolBarRect.x + toolBarRect.width / 2 - 240, 15, 120, 30},
+                 "size: " + lineThicknessText, g_settings.UIBackground, 0.3f,
+                 false, g_settings.UIBackgroundBorder, 1.0f);
 
   if (Widgets::Button(UiFont,
                       {toolBarRect.x + toolBarRect.width - 90, 15, 80, 30},

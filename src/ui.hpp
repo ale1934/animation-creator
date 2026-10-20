@@ -9,7 +9,7 @@ private:
   Vector2 dimensions;
 
   bool needsInput = false;
-  bool showTools = true;
+  bool showTools = false;
 
   Animation *currentAnimation;
 
@@ -20,11 +20,8 @@ private:
 
   ColorWheelState wheel;
   Color col1 = BLACK;
-  Color col2 = GRAY;
-  Color col3 = BLUE;
-  Color col4 = RED;
-  Color col5 = GREEN;
-  std::vector<Color> currentPallete = {col1, col2, col3, col4, col5};
+  Color col2 = RED;
+  std::vector<Color> currentPallete = {col1, col2};
 
   Rectangle toolBarRect;
 
