@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <raylib.h>
+#include <string>
 
 // Constructor sets resolution of the frame to given by main()
 Frame::Frame(Vector2 res) {
@@ -151,11 +152,18 @@ void Frame::handleMouse(bool canDraw) {
     }
   }
 
+  // Change brush size with '+' or '-'
+  if (IsKeyPressed(KEY_EQUAL)) {
+    g_settings.lineThickness += 2.0f;
+  } else if (IsKeyPressed(KEY_MINUS)) {
+    g_settings.lineThickness -= 2.0f;
+  }
+
   prevMousePos = mousePos;
 }
 
 // Draws Frame Texture onto Screen
-void Frame::renderFrame() {
+void Frame::renderFrame(int frameIndex) {
   Rectangle source = {0, 0, (float)canvas.texture.width,
                       (float)-canvas.texture.height};
 
@@ -169,6 +177,14 @@ void Frame::renderFrame() {
   DrawCircleLinesEx(GetMousePosition(),
                     g_settings.lineThickness * g_settings.zoom / 2.0f, 2.0f,
                     (Color){127, 127, 127, 255});
+
+  // Draw Frame index at the bottom
+  std::string frameId = "Frame: " + std::to_string(frameIndex);
+  DrawTextEx(g_settings.UiFont, frameId.c_str(),
+             {(float)canvas.texture.width / 2 -
+                  (float)MeasureText(frameId.c_str(), 32) / 2,
+              (float)canvas.texture.height - 40},
+             32, 0.0f, BLUE);
 }
 
 void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {

@@ -14,8 +14,6 @@ add_executable(animation-creator
     src/main.cpp
     src/frame.cpp
     src/animation.cpp
-    src/ui.cpp
-    src/widgets.cpp
 	src/settings.cpp
 )
 

@@ -33,7 +33,7 @@ private:
 public:
   Frame(Vector2 res);
   void handleMouse(bool canDraw);
-  void renderFrame();
+  void renderFrame(int frameIndex);
   Image getImage();
 
   void renderOnion(Shader &shader, int tintLoc, Color tint);

@@ -68,6 +68,11 @@ void Animation::update() {
         currentFrame--;
       }
     }
+
+    // Save Animation
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
+      exportGif("animation.gif");
+    }
   }
 
   // Advance animation based on elapsed time
@@ -84,7 +89,7 @@ void Animation::update() {
 }
 
 void Animation::render() {
-  frames.at(currentFrame)->renderFrame();
+  frames.at(currentFrame)->renderFrame(currentFrame);
 
   if (!animating) {
     // Second layer (two frames back), drawn first so it sits underneath

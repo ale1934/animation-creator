@@ -1,5 +1,5 @@
 #include "animation.hpp"
-#include "ui.hpp"
+#include "settings.hpp"
 #include <raylib.h>
 
 int main() {
@@ -7,25 +7,23 @@ int main() {
   const int screenHeight = 640;
   InitWindow(screenWidth, screenHeight, "Animation Creator");
 
+  g_settings.UiFont =
+      LoadFont("resources/CascadiaMono/CaskaydiaMonoNerdFont-Regular.ttf");
+
   Animation myAnimation = Animation({screenWidth, screenHeight}, 4, 1);
-  UI myUI = UI({screenWidth, screenHeight}, myAnimation);
 
   SetTargetFPS(165);
 
-  while (!WindowShouldClose()) {
-    myUI.update();
+  HideCursor();
 
-    if (!myUI.getNeedInput()) {
-      HideCursor();
-      myAnimation.update();
-    } else
-      ShowCursor();
+  while (!WindowShouldClose()) {
+
+    myAnimation.update();
 
     BeginDrawing();
     ClearBackground(Color{35, 38, 45, 255});
 
     myAnimation.render();
-    myUI.render();
 
     EndDrawing();
   }
