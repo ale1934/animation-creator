@@ -96,7 +96,8 @@ void Frame::handleMouse(bool canDraw) {
       (leftButtonDown || rightButtonDown) && !isPanning && !ctrlDown;
 
   if (canDraw && isDrawing && !isPanning && !ctrlDown) {
-    activeColor = rightButtonDown ? g_settings.bgColor : g_settings.drawColor;
+    activeColor = rightButtonDown ? g_settings.palette[g_settings.bgColor]
+                                  : g_settings.palette[g_settings.drawColor];
 
     // Only draw a segment if we were already drawing last frame.
     if (wasDrawing) {
@@ -205,6 +206,16 @@ void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {
   DrawTexturePro(canvas.texture, source, dest, {0, 0}, 0.0f, WHITE);
 
   EndShaderMode();
+}
+
+void Frame::setImage(Image image) {
+  ImageFlipVertical(&image);
+  ImageFormat(&image, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+
+  // Upload pixels into the existing texture so the render target stays valid
+  UpdateTexture(canvas.texture, image.data);
+
+  UnloadImage(image);
 }
 
 Image Frame::getImage() {

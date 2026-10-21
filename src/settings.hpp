@@ -3,9 +3,11 @@
 #include <raylib.h>
 
 struct Settings {
-  Color drawColor = BLACK;
-  Color bgColor = RAYWHITE;
-  float lineThickness = 4.0f;
+  Color palette[7] = {BLACK, RED, BLUE, GREEN, PURPLE, YELLOW, RAYWHITE};
+
+  int drawColor = 0;
+  int bgColor = 6;
+  float lineThickness = 8.0f;
 
   Font UiFont;
 

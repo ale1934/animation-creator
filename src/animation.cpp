@@ -1,10 +1,13 @@
 #include "animation.hpp"
+#include "frame.hpp"
 #include "gif.h"
+#include "settings.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <filesystem>
 #include <raylib.h>
 #include <string>
+#include <sys/types.h>
 
 static const char *onionFS = R"(
 #version 330
@@ -69,6 +72,23 @@ void Animation::update() {
       }
     }
 
+    // Duplicate frame after current
+    if (IsKeyPressed(KEY_P)) {
+      frames.insert(frames.begin() + currentFrame + 1,
+                    new Frame(animationResolution));
+
+      frames.at(currentFrame + 1)
+          ->setImage(frames.at(currentFrame)->getImage());
+      currentFrame++;
+    }
+
+    // Change Color using keys 1-7
+    int key = GetKeyPressed();
+
+    if (std::find(std::begin(keys), std::end(keys), key) != std::end(keys)) {
+      g_settings.drawColor = key - 49;
+    }
+
     // Save Animation
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
       exportGif("animation.gif");
@@ -103,6 +123,9 @@ void Animation::render() {
                                             Color{255, 0, 0, 30});
     }
   }
+
+  DrawCircleV({20, 20}, 15.0f, g_settings.palette[g_settings.drawColor]);
+  DrawCircleLinesEx({20, 20}, 15.0f, 2.0f, BLACK);
 }
 
 void Animation::clearMousePos() { frames.at(currentFrame)->clearMousePos(); }
