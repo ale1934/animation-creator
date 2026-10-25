@@ -17,12 +17,6 @@ Frame::Frame(Vector2 res) {
   saveState();
 }
 
-// Clears the mouse position. useful for when stopping undates
-void Frame::clearMousePos() {
-  prevMousePos = Vector2{0.0f, 0.0f};
-  mousePos = Vector2{0.0f, 0.0f};
-}
-
 // Helper function to save the current canvas into a image snapshot
 void Frame::saveState() {
   // A new stroke invalidates the redo history.

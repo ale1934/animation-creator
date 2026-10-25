@@ -30,7 +30,7 @@ public:
 
   int getCurrentFrame() const;
 
-  void clearMousePos();
+  void setFrame(int frame, Texture2D image);
 
   void exportPNGs(const std::string &dir);
   void exportGif(const std::string &path);

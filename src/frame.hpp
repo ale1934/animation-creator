@@ -38,5 +38,4 @@ public:
   void setImage(Image image);
 
   void renderOnion(Shader &shader, int tintLoc, Color tint);
-  void clearMousePos();
 };

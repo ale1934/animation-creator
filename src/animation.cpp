@@ -128,7 +128,11 @@ void Animation::render() {
   DrawCircleLinesEx({20, 20}, 15.0f, 2.0f, BLACK);
 }
 
-void Animation::clearMousePos() { frames.at(currentFrame)->clearMousePos(); }
+void Animation::setFrame(int frame, Texture2D image) {
+  if (frame > frames.size() - 1)
+    frames.push_back(new Frame(animationResolution));
+  frames[frame]->setImage(LoadImageFromTexture(image));
+}
 
 void Animation::exportPNGs(const std::string &dir) {
   std::filesystem::create_directories(dir);
