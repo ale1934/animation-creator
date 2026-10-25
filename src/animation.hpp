@@ -16,6 +16,9 @@ private:
   bool animating = false;
   bool canDraw = true;
 
+  int keys[7] = {KEY_ONE,  KEY_TWO, KEY_THREE, KEY_FOUR,
+                 KEY_FIVE, KEY_SIX, KEY_SEVEN};
+
   Shader onionShader;
   int tintLoc;
 
@@ -27,7 +30,7 @@ public:
 
   int getCurrentFrame() const;
 
-  void clearMousePos();
+  void setFrame(int frame, Texture2D image);
 
   void exportPNGs(const std::string &dir);
   void exportGif(const std::string &path);

@@ -3,20 +3,19 @@
 #include <raylib.h>
 
 struct Settings {
-  Color drawColor = BLACK;
-  Color bgColor = RAYWHITE;
-  float lineThickness = 4.0f;
-  bool needsInput = false;
+  Color palette[7] = {BLACK, RED, BLUE, GREEN, PURPLE, YELLOW, RAYWHITE};
+
+  int drawColor = 0;
+  int bgColor = 6;
+  float lineThickness = 8.0f;
+
+  Font UiFont;
 
   Vector2 canvasOffset = {0.0f, 0.0f};
 
   float zoom = 1.0f;
   float minZoom = 0.1f;
   float maxZoom = 8.0f;
-
-  Color UIBackground = GetColor(0xe6e6faff);
-  Color UIBackgroundBorder = GetColor(0x555555ff);
-  Color UITextColor = DARKBLUE;
 };
 
 // Declared here, defined once in settings.cpp

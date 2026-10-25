@@ -14,14 +14,20 @@ add_executable(animation-creator
     src/main.cpp
     src/frame.cpp
     src/animation.cpp
-    src/ui.cpp
-    src/widgets.cpp
 	src/settings.cpp
 )
 
 target_include_directories(animation-creator PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+if(MINGW)
+    target_link_options(animation-creator PRIVATE
+        -static
+        -static-libgcc
+        -static-libstdc++
+    )
+endif()
 
 find_package(raylib CONFIG REQUIRED)
 target_link_libraries(animation-creator PRIVATE raylib)

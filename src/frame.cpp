@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <raylib.h>
+#include <string>
 
 // Constructor sets resolution of the frame to given by main()
 Frame::Frame(Vector2 res) {
@@ -14,12 +15,6 @@ Frame::Frame(Vector2 res) {
   EndTextureMode();
 
   saveState();
-}
-
-// Clears the mouse position. useful for when stopping undates
-void Frame::clearMousePos() {
-  prevMousePos = Vector2{0.0f, 0.0f};
-  mousePos = Vector2{0.0f, 0.0f};
 }
 
 // Helper function to save the current canvas into a image snapshot
@@ -95,7 +90,8 @@ void Frame::handleMouse(bool canDraw) {
       (leftButtonDown || rightButtonDown) && !isPanning && !ctrlDown;
 
   if (canDraw && isDrawing && !isPanning && !ctrlDown) {
-    activeColor = rightButtonDown ? g_settings.bgColor : g_settings.drawColor;
+    activeColor = rightButtonDown ? g_settings.palette[g_settings.bgColor]
+                                  : g_settings.palette[g_settings.drawColor];
 
     // Only draw a segment if we were already drawing last frame.
     if (wasDrawing) {
@@ -151,11 +147,18 @@ void Frame::handleMouse(bool canDraw) {
     }
   }
 
+  // Change brush size with '+' or '-'
+  if (IsKeyPressed(KEY_EQUAL)) {
+    g_settings.lineThickness += 2.0f;
+  } else if (IsKeyPressed(KEY_MINUS)) {
+    g_settings.lineThickness -= 2.0f;
+  }
+
   prevMousePos = mousePos;
 }
 
 // Draws Frame Texture onto Screen
-void Frame::renderFrame() {
+void Frame::renderFrame(int frameIndex) {
   Rectangle source = {0, 0, (float)canvas.texture.width,
                       (float)-canvas.texture.height};
 
@@ -169,6 +172,14 @@ void Frame::renderFrame() {
   DrawCircleLinesEx(GetMousePosition(),
                     g_settings.lineThickness * g_settings.zoom / 2.0f, 2.0f,
                     (Color){127, 127, 127, 255});
+
+  // Draw Frame index at the bottom
+  std::string frameId = "Frame: " + std::to_string(frameIndex);
+  DrawTextEx(g_settings.UiFont, frameId.c_str(),
+             {(float)canvas.texture.width / 2 -
+                  (float)MeasureText(frameId.c_str(), 32) / 2,
+              (float)canvas.texture.height - 40},
+             32, 0.0f, BLUE);
 }
 
 void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {
@@ -189,6 +200,16 @@ void Frame::renderOnion(Shader &shader, int tintLoc, Color tint) {
   DrawTexturePro(canvas.texture, source, dest, {0, 0}, 0.0f, WHITE);
 
   EndShaderMode();
+}
+
+void Frame::setImage(Image image) {
+  ImageFlipVertical(&image);
+  ImageFormat(&image, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+
+  // Upload pixels into the existing texture so the render target stays valid
+  UpdateTexture(canvas.texture, image.data);
+
+  UnloadImage(image);
 }
 
 Image Frame::getImage() {

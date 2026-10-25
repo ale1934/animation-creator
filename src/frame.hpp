@@ -26,16 +26,16 @@ private:
   bool wasDrawing = false;
   bool isDrawing = false;
 
-  Color activeColor = g_settings.drawColor;
+  Color activeColor = g_settings.palette[g_settings.drawColor];
 
   void saveState(); // Saves image state
 
 public:
   Frame(Vector2 res);
   void handleMouse(bool canDraw);
-  void renderFrame();
+  void renderFrame(int frameIndex);
   Image getImage();
+  void setImage(Image image);
 
   void renderOnion(Shader &shader, int tintLoc, Color tint);
-  void clearMousePos();
 };
