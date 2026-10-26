@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
   int fps = 4;
 
   bool hasProject = false;
+  bool creatingProject = false;
 
   InitWindow(screenWidth, screenHeight, "Animation Creator");
 
@@ -20,6 +21,8 @@ int main(int argc, char *argv[]) {
 
   char dragText[] = "drag and drop project here!";
   char bottomText[] = "or press enter to create new project";
+  std::string resBaseText = "Selected Resolution: ";
+  std::string fpsBaseText = "Selected Fps: ";
 
   const float fontSize = g_settings.UiFont.baseSize;
   const float smallFontSize = fontSize / 2.0f;
@@ -31,13 +34,21 @@ int main(int argc, char *argv[]) {
 
   std::string selectedProject;
 
+  Vector2 selectedResolution = {screenWidth, screenHeight};
+  int selectedFps = 4;
+
+  bool selectingResX = true;
+  bool selectingResY = false;
+  bool selectingFps = false;
+
   while (!WindowShouldClose()) {
 
-    if (!hasProject) {
+    if (!hasProject && !creatingProject) {
       FilePathList filepath = LoadDroppedFiles();
 
       if (IsKeyDown(KEY_ENTER)) {
-        hasProject = true;
+        HideCursor();
+        creatingProject = true;
       }
 
       if (filepath.count > 0) {
@@ -60,25 +71,137 @@ int main(int argc, char *argv[]) {
 
         UnloadDroppedFiles(filepath);
 
+        HideCursor();
         hasProject = true;
       }
 
       BeginDrawing();
 
-      ClearBackground(RAYWHITE);
+      ClearBackground(GetColor(0x333333FF));
 
       DrawTextEx(
           g_settings.UiFont, dragText,
           {screenWidth / 2.0f - dragSize.x / 2.0f, screenHeight / 2.0f - 20},
-          fontSize, 0.0f, BLACK);
+          fontSize, 0.0f, RAYWHITE);
 
       DrawTextEx(g_settings.UiFont, bottomText,
                  {screenWidth / 2.0f - bottomSize.x / 2.0f,
                   screenHeight / 2.0f + 20.0f},
-                 smallFontSize, 0.0f, BLACK);
+                 smallFontSize, 0.0f, RAYWHITE);
 
       EndDrawing();
 
+    } else if (creatingProject) {
+
+      std::string resTextX = TextFormat("%.0f", selectedResolution.x);
+
+      std::string resTextY = TextFormat("%.0f", selectedResolution.y);
+
+      std::string fpsText = TextFormat("%d", selectedFps);
+
+      Vector2 resSize = MeasureTextEx(
+          g_settings.UiFont, (resBaseText + resTextX + resTextY).c_str(),
+          fontSize, 0.0f);
+
+      Vector2 fpsSize = MeasureTextEx(
+          g_settings.UiFont, (fpsBaseText + fpsText).c_str(), fontSize, 0.0f);
+
+      if (IsKeyPressed(KEY_RIGHT) && !selectingFps) {
+        if (selectingResX) {
+          selectingResX = false;
+          selectingResY = true;
+        } else {
+          selectingResY = false;
+          selectingFps = true;
+        }
+      }
+
+      if (IsKeyPressed(KEY_LEFT) && !selectingResX) {
+        if (selectingResY) {
+          selectingResY = false;
+          selectingResX = true;
+        } else {
+          selectingFps = false;
+          selectingResY = true;
+        }
+      }
+
+      if (IsKeyPressed(KEY_UP)) {
+        if (selectingResX) {
+          selectedResolution.x += 40;
+        } else if (selectingResY) {
+          selectedResolution.y += 40;
+        } else {
+          selectedFps += 2;
+        }
+      }
+
+      if (IsKeyPressed(KEY_DOWN)) {
+        if (selectingResX) {
+          selectedResolution.x -= 40;
+        } else if (selectingResY) {
+          selectedResolution.y -= 40;
+        } else {
+          selectedFps -= 2;
+        }
+      }
+
+      if (IsKeyPressed(KEY_ENTER)) {
+        myAnimation = Animation({selectedResolution.x, selectedResolution.y},
+                                selectedFps, 1);
+        SetWindowSize(selectedResolution.x, selectedResolution.y);
+        creatingProject = false;
+        hasProject = true;
+      }
+
+      BeginDrawing();
+      ClearBackground(RAYWHITE);
+
+      DrawTextEx(
+          g_settings.UiFont, resBaseText.c_str(),
+          {screenWidth / 2.0f - resSize.x / 2.0f, screenHeight / 2.0f - 30},
+          g_settings.UiFont.baseSize, 0.0f, BLACK);
+
+      DrawTextEx(g_settings.UiFont, resTextX.c_str(),
+                 {screenWidth / 2.0f - resSize.x / 2.0f +
+                      MeasureTextEx(g_settings.UiFont, resBaseText.c_str(),
+                                    fontSize, 0.0f)
+                          .x,
+                  screenHeight / 2.0f - 30},
+                 fontSize, 0.0f, selectingResX ? BLUE : BLACK);
+
+      DrawTextEx(
+          g_settings.UiFont, "x",
+          {screenWidth / 2.0f - resSize.x / 2.0f +
+               MeasureTextEx(g_settings.UiFont,
+                             (resBaseText + resTextX).c_str(), fontSize, 0.0f)
+                   .x,
+           screenHeight / 2.0f - 30},
+          fontSize, 0.0f, BLACK);
+
+      DrawTextEx(g_settings.UiFont, resTextY.c_str(),
+                 {screenWidth / 2.0f - resSize.x / 2.0f +
+                      MeasureTextEx(g_settings.UiFont,
+                                    (resBaseText + resTextX + "x").c_str(),
+                                    fontSize, 0.0f)
+                          .x,
+                  screenHeight / 2.0f - 30},
+                 fontSize, 0.0f, selectingResY ? BLUE : BLACK);
+
+      DrawTextEx(
+          g_settings.UiFont, fpsBaseText.c_str(),
+          {screenWidth / 2.0f - fpsSize.x / 2.0f, screenHeight / 2.0f + 10},
+          g_settings.UiFont.baseSize, 0.0f, BLACK);
+
+      DrawTextEx(g_settings.UiFont, fpsText.c_str(),
+                 {screenWidth / 2.0f - fpsSize.x / 2.0f +
+                      MeasureTextEx(g_settings.UiFont, fpsBaseText.c_str(),
+                                    fontSize, 0.0f)
+                          .x,
+                  screenHeight / 2.0f + 10},
+                 fontSize, 0.0f, selectingFps ? BLUE : BLACK);
+
+      EndDrawing();
     } else {
       myAnimation.update();
 
