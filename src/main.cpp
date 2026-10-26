@@ -77,17 +77,17 @@ int main(int argc, char *argv[]) {
 
       BeginDrawing();
 
-      ClearBackground(RAYWHITE);
+      ClearBackground(GetColor(0x333333FF));
 
       DrawTextEx(
           g_settings.UiFont, dragText,
           {screenWidth / 2.0f - dragSize.x / 2.0f, screenHeight / 2.0f - 20},
-          fontSize, 0.0f, BLACK);
+          fontSize, 0.0f, RAYWHITE);
 
       DrawTextEx(g_settings.UiFont, bottomText,
                  {screenWidth / 2.0f - bottomSize.x / 2.0f,
                   screenHeight / 2.0f + 20.0f},
-                 smallFontSize, 0.0f, BLACK);
+                 smallFontSize, 0.0f, RAYWHITE);
 
       EndDrawing();
 
