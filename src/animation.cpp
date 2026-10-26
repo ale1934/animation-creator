@@ -131,6 +131,7 @@ void Animation::render() {
 void Animation::setFrame(int frame, Texture2D image) {
   if (frame > frames.size() - 1)
     frames.push_back(new Frame(animationResolution));
+
   frames[frame]->setImage(LoadImageFromTexture(image));
 }
 

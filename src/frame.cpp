@@ -209,6 +209,8 @@ void Frame::setImage(Image image) {
   // Upload pixels into the existing texture so the render target stays valid
   UpdateTexture(canvas.texture, image.data);
 
+  saveState();
+
   UnloadImage(image);
 }
 
