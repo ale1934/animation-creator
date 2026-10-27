@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 
       BeginDrawing();
 
-      ClearBackground(RAYWHITE);
+      ClearBackground(GetColor(0x333333FF));
 
       DrawTextCenteredEx(g_settings.UiFont, dragText, fontSize, BLACK, 20);
 
