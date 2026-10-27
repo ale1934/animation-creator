@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   bool hasProject = false;
   bool creatingProject = false;
   bool inPause = false;
+  bool showHelp = false;
 
   InitWindow(screenWidth, screenHeight, "Animation Creator");
 
@@ -46,6 +47,19 @@ int main(int argc, char *argv[]) {
   bool selectingResY = false;
   bool selectingFps = false;
 
+  std::string resumeText = "Resume";
+  std::string helpText = "Keybinds";
+
+  Vector2 resumeSize =
+      MeasureTextEx(g_settings.UiFont, resumeText.c_str(), fontSize, 0.0f);
+  Vector2 helpSize =
+      MeasureTextEx(g_settings.UiFont, helpText.c_str(), fontSize, 0.0f);
+
+  bool selectingResume = true;
+  bool selectingHelp = false;
+
+  bool selectingBack = true;
+
   SetExitKey(KEY_NULL);
 
   while (!WindowShouldClose()) {
@@ -71,6 +85,11 @@ int main(int argc, char *argv[]) {
 
         int frames = 0;
         Image anim = LoadImageAnim(selectedProject.c_str(), &frames);
+
+        myAnimation =
+            Animation({(float)anim.width, (float)anim.height}, fps, 1);
+
+        SetWindowSize(anim.width, anim.height);
 
         for (int i = 0; i < frames; i++) {
           unsigned int nextFrameDataOffset = anim.width * anim.height * 4 * i;
@@ -210,10 +229,54 @@ int main(int argc, char *argv[]) {
 
       EndDrawing();
     } else if (inPause) {
-      // TODO:
+
+      if (IsKeyPressed(KEY_DOWN)) {
+        if (selectingResume && !showHelp) {
+          selectingResume = false;
+          selectingHelp = true;
+        }
+      }
+
+      if (IsKeyPressed(KEY_UP)) {
+
+        if (selectingHelp && !showHelp) {
+          selectingHelp = false;
+          selectingResume = true;
+        }
+      }
+
+      if (IsKeyPressed(KEY_ENTER)) {
+        if (!showHelp) {
+          if (selectingResume) {
+            inPause = false;
+          } else {
+            showHelp = true;
+          }
+        } else {
+          showHelp = false;
+        }
+      }
+
       BeginDrawing();
 
       ClearBackground(RAYWHITE);
+
+      if (!showHelp) {
+        DrawTextCenteredEx(g_settings.UiFont, "Paused", fontSize, BLACK, 250);
+
+        DrawTextEx(g_settings.UiFont, resumeText.c_str(),
+                   {GetScreenWidth() / 2.0f - resumeSize.x / 2,
+                    GetScreenHeight() / 2.0f - resumeSize.y / 2 - 20},
+                   fontSize, 0.0f, selectingResume ? BLUE : BLACK);
+
+        DrawTextEx(g_settings.UiFont, helpText.c_str(),
+                   {GetScreenWidth() / 2.0f - helpSize.x / 2,
+                    GetScreenHeight() / 2.0f - helpSize.y / 2 + 10},
+                   fontSize, 0.0f, selectingHelp ? BLUE : BLACK);
+      } else {
+        DrawTextCenteredEx(g_settings.UiFont, "Back", fontSize,
+                           selectingBack ? BLUE : BLACK, 0);
+      }
 
       EndDrawing();
     } else {
